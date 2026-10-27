@@ -24,24 +24,44 @@ public class FrmCitas extends javax.swing.JFrame {
     public FrmCitas() {
         initComponents();
         setLocationRelativeTo(null);
+                cbMedico.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
+            "Dr. Ramírez", "Dra. Santos", "Dr. Fernández", "Dra. Morales",
+            "Dr. Castillo", "Lic. Vargas", "Dra. Peña", "Dr. Herrera",
+            "Dra. Núñez", "Dr. Jiménez"
+        }));
         modelo = (DefaultTableModel) tblCitas.getModel();
         modelo.setRowCount(0);
         cargarEspecialidades();
+        
     }
-
-    private void cargarEspecialidades() {
+private void cargarEspecialidades() {
         String medico = cbMedico.getSelectedItem().toString();
         String[] esp;
         if (medico.equals("Dr. Ramírez")) {
             esp = new String[]{"Cardiología", "Medicina General"};
         } else if (medico.equals("Dra. Santos")) {
-            esp = new String[]{"Pediatría"};
+            esp = new String[]{"Pediatría", "Neonatología"};
+        } else if (medico.equals("Dr. Fernández")) {
+            esp = new String[]{"Dermatología", "Alergología"};
+        } else if (medico.equals("Dra. Morales")) {
+            esp = new String[]{"Psicología Clínica", "Terapia Familiar"};
+        } else if (medico.equals("Dr. Castillo")) {
+            esp = new String[]{"Odontología General", "Ortodoncia", "Endodoncia"};
+        } else if (medico.equals("Lic. Vargas")) {
+            esp = new String[]{"Nutrición Clínica", "Nutrición Deportiva", "Nutrición Pediátrica"};
+        } else if (medico.equals("Dra. Peña")) {
+            esp = new String[]{"Ginecología", "Obstetricia"};
+        } else if (medico.equals("Dr. Herrera")) {
+            esp = new String[]{"Traumatología", "Ortopedia"};
+        } else if (medico.equals("Dra. Núñez")) {
+            esp = new String[]{"Oftalmología", "Optometría"};
         } else {
-            esp = new String[]{"Dermatología", "Alergología" , "Medicina General" ,  };
+            esp = new String[]{"Neurología", "Psiquiatría"};
         }
         cbEspecialidad.setModel(new javax.swing.DefaultComboBoxModel<>(esp));
     }
-        private boolean camposValidos() {
+
+    private boolean camposValidos() {
         if (txtPaciente.getText().trim().isEmpty()
                 || txtFecha.getText().trim().isEmpty()
                 || txtHora.getText().trim().isEmpty()) {
@@ -50,6 +70,7 @@ public class FrmCitas extends javax.swing.JFrame {
         }
         return true;
     }
+    
         private void limpiar() {
         txtPaciente.setText("");
         txtFecha.setText("");
@@ -59,7 +80,22 @@ public class FrmCitas extends javax.swing.JFrame {
         tblCitas.clearSelection();
         txtPaciente.requestFocus();
     }
-    
+    private boolean hayConflicto(String medico, String fecha, String hora, int filaIgnorar) {
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            if (i == filaIgnorar) {
+                continue;
+            }
+            boolean mismoMedico = modelo.getValueAt(i, 2).toString().equals(medico);
+            boolean mismaFecha = modelo.getValueAt(i, 4).toString().equals(fecha);
+            boolean mismaHora = modelo.getValueAt(i, 5).toString().equals(hora);
+            boolean cancelada = modelo.getValueAt(i, 6).toString().equals("CANCELADA");
+
+            if (mismoMedico && mismaFecha && mismaHora && !cancelada) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.
@@ -92,27 +128,57 @@ public class FrmCitas extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Registro de Citas Médicas");
+        setBackground(new java.awt.Color(245, 247, 250));
+        setFocusTraversalPolicyProvider(true);
 
-        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
+        lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
+        lblTitulo.setForeground(new java.awt.Color(31, 58, 95));
         lblTitulo.setText("REGISTRO DE CITAS MÉDICAS");
 
+        lblPaciente.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblPaciente.setForeground(new java.awt.Color(51, 51, 51));
         lblPaciente.setText("Paciente:");
+        lblPaciente.setFocusTraversalPolicyProvider(true);
 
+        txtPaciente.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        lblMedico.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblMedico.setForeground(new java.awt.Color(51, 51, 51));
         lblMedico.setText("Médico:");
+        lblMedico.setFocusTraversalPolicyProvider(true);
 
+        cbMedico.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         cbMedico.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Dr. Ramírez", "Dra. Santos", "Dr. Fernández" }));
         cbMedico.addActionListener(this::cbMedicoActionPerformed);
 
+        lblEspecialidad.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblEspecialidad.setForeground(new java.awt.Color(51, 51, 51));
         lblEspecialidad.setText("Especialidad:");
+        lblEspecialidad.setFocusTraversalPolicyProvider(true);
 
+        cbEspecialidad.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        lblFecha.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblFecha.setForeground(new java.awt.Color(51, 51, 51));
         lblFecha.setText("Fecha:");
+        lblFecha.setFocusTraversalPolicyProvider(true);
 
+        txtFecha.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         txtFecha.addActionListener(this::txtFechaActionPerformed);
 
+        lblHora.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblHora.setForeground(new java.awt.Color(51, 51, 51));
         lblHora.setText("Hora:");
+        lblHora.setFocusTraversalPolicyProvider(true);
 
+        txtHora.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+
+        lblEstado.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
+        lblEstado.setForeground(new java.awt.Color(51, 51, 51));
         lblEstado.setText("Estado:");
+        lblEstado.setFocusTraversalPolicyProvider(true);
 
+        cbEstado.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         cbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PENDIENTE", "CONFIRMADA", "CANCELADA" }));
 
         btnAgendar.setText("Agendar");
@@ -170,7 +236,6 @@ public class FrmCitas extends javax.swing.JFrame {
                         .addComponent(btnEliminar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnLimpiar))
-                    .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 311, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblPaciente)
@@ -194,8 +259,9 @@ public class FrmCitas extends javax.swing.JFrame {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                     .addComponent(cbEspecialidad, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                     .addComponent(txtHora)))
-                            .addComponent(txtPaciente))))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(txtPaciente)))
+                    .addComponent(lblTitulo, javax.swing.GroupLayout.PREFERRED_SIZE, 450, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(62, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(scrollCitas, javax.swing.GroupLayout.DEFAULT_SIZE, 547, Short.MAX_VALUE)
@@ -254,25 +320,40 @@ cargarEspecialidades();        // TODO add your handling code here:
     }//GEN-LAST:event_cbMedicoActionPerformed
 
     private void btnAgendarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarActionPerformed
- if (!camposValidos()) {
+         if (!camposValidos()) {
+            return;
+        }
+
+        String medico = cbMedico.getSelectedItem().toString();
+        String fecha = txtFecha.getText().trim();
+        String hora = txtHora.getText().trim();
+        String estado = cbEstado.getSelectedItem().toString();
+
+        if (!estado.equals("CANCELADA") && hayConflicto(medico, fecha, hora, -1)) {
+            JOptionPane.showMessageDialog(this,
+                    medico + " ya tiene una cita el " + fecha + " a las " + hora);
             return;
         }
 
         modelo.addRow(new Object[]{
             contadorId++,
             txtPaciente.getText().trim(),
-            cbMedico.getSelectedItem(),
+            medico,
             cbEspecialidad.getSelectedItem(),
-            txtFecha.getText().trim(),
-            txtHora.getText().trim(),
-            cbEstado.getSelectedItem()
+            fecha,
+            hora,
+            estado
         });
 
-        limpiar();        // TODO add your handling code here:
+        limpiar();
+        
+        // TODO add your handling code here:
     }//GEN-LAST:event_btnAgendarActionPerformed
 
     private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
-limpiar();        // TODO add your handling code here:
+limpiar();  
+
+// TODO add your handling code here:
     }//GEN-LAST:event_btnLimpiarActionPerformed
 
     private void tblCitasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCitasMouseClicked
@@ -294,7 +375,7 @@ limpiar();        // TODO add your handling code here:
     }//GEN-LAST:event_tblCitasMouseClicked
 
     private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
-               int fila = tblCitas.getSelectedRow();
+                       int fila = tblCitas.getSelectedRow();
         if (fila == -1) {
             JOptionPane.showMessageDialog(this, "Selecciona una cita de la tabla");
             return;
@@ -303,15 +384,25 @@ limpiar();        // TODO add your handling code here:
             return;
         }
 
-        // Fila real del modelo (por si la tabla está ordenada)
         fila = tblCitas.convertRowIndexToModel(fila);
 
+        String medico = cbMedico.getSelectedItem().toString();
+        String fecha = txtFecha.getText().trim();
+        String hora = txtHora.getText().trim();
+        String estado = cbEstado.getSelectedItem().toString();
+
+        if (!estado.equals("CANCELADA") && hayConflicto(medico, fecha, hora, fila)) {
+            JOptionPane.showMessageDialog(this,
+                    medico + " ya tiene una cita el " + fecha + " a las " + hora);
+            return;
+        }
+
         modelo.setValueAt(txtPaciente.getText().trim(), fila, 1);
-        modelo.setValueAt(cbMedico.getSelectedItem(), fila, 2);
+        modelo.setValueAt(medico, fila, 2);
         modelo.setValueAt(cbEspecialidad.getSelectedItem(), fila, 3);
-        modelo.setValueAt(txtFecha.getText().trim(), fila, 4);
-        modelo.setValueAt(txtHora.getText().trim(), fila, 5);
-        modelo.setValueAt(cbEstado.getSelectedItem(), fila, 6);
+        modelo.setValueAt(fecha, fila, 4);
+        modelo.setValueAt(hora, fila, 5);
+        modelo.setValueAt(estado, fila, 6);
 
         JOptionPane.showMessageDialog(this, "Cita modificada correctamente");
         limpiar();
