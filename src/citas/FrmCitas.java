@@ -5,6 +5,7 @@
 package citas;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author RETURN PROGAMACION
@@ -40,6 +41,26 @@ public class FrmCitas extends javax.swing.JFrame {
         }
         cbEspecialidad.setModel(new javax.swing.DefaultComboBoxModel<>(esp));
     }
+        private boolean camposValidos() {
+        if (txtPaciente.getText().trim().isEmpty()
+                || txtFecha.getText().trim().isEmpty()
+                || txtHora.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Completa todos los campos");
+            return false;
+        }
+        return true;
+    }
+        private void limpiar() {
+        txtPaciente.setText("");
+        txtFecha.setText("");
+        txtHora.setText("");
+        cbMedico.setSelectedIndex(0);
+        cbEstado.setSelectedIndex(0);
+        tblCitas.clearSelection();
+        txtPaciente.requestFocus();
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -95,12 +116,16 @@ public class FrmCitas extends javax.swing.JFrame {
         cbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PENDIENTE", "CONFIRMADA", "CANCELADA" }));
 
         btnAgendar.setText("Agendar");
+        btnAgendar.addActionListener(this::btnAgendarActionPerformed);
 
         btnModificar.setText("Modificar");
+        btnModificar.addActionListener(this::btnModificarActionPerformed);
 
         btnEliminar.setText("Eliminar");
+        btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
         btnLimpiar.setText("Limpiar");
+        btnLimpiar.addActionListener(this::btnLimpiarActionPerformed);
 
         tblCitas.setAutoCreateRowSorter(true);
         tblCitas.setModel(new javax.swing.table.DefaultTableModel(
@@ -122,7 +147,11 @@ public class FrmCitas extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        tblCitas.setColumnSelectionAllowed(true);
+        tblCitas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCitasMouseClicked(evt);
+            }
+        });
         scrollCitas.setViewportView(tblCitas);
         tblCitas.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
 
@@ -223,6 +252,91 @@ public class FrmCitas extends javax.swing.JFrame {
     private void cbMedicoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbMedicoActionPerformed
 cargarEspecialidades();        // TODO add your handling code here:
     }//GEN-LAST:event_cbMedicoActionPerformed
+
+    private void btnAgendarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAgendarActionPerformed
+ if (!camposValidos()) {
+            return;
+        }
+
+        modelo.addRow(new Object[]{
+            contadorId++,
+            txtPaciente.getText().trim(),
+            cbMedico.getSelectedItem(),
+            cbEspecialidad.getSelectedItem(),
+            txtFecha.getText().trim(),
+            txtHora.getText().trim(),
+            cbEstado.getSelectedItem()
+        });
+
+        limpiar();        // TODO add your handling code here:
+    }//GEN-LAST:event_btnAgendarActionPerformed
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+limpiar();        // TODO add your handling code here:
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void tblCitasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCitasMouseClicked
+        int fila = tblCitas.getSelectedRow();
+        if (fila == -1) {
+            return;
+        }
+
+        // Convertimos la fila visible a la fila real del modelo (por si ordenaste la tabla)
+        fila = tblCitas.convertRowIndexToModel(fila);
+
+        txtPaciente.setText(modelo.getValueAt(fila, 1).toString());
+        cbMedico.setSelectedItem(modelo.getValueAt(fila, 2));
+        cbEspecialidad.setSelectedItem(modelo.getValueAt(fila, 3));
+        txtFecha.setText(modelo.getValueAt(fila, 4).toString());
+        txtHora.setText(modelo.getValueAt(fila, 5).toString());
+        cbEstado.setSelectedItem(modelo.getValueAt(fila, 6));
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tblCitasMouseClicked
+
+    private void btnModificarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnModificarActionPerformed
+               int fila = tblCitas.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Selecciona una cita de la tabla");
+            return;
+        }
+        if (!camposValidos()) {
+            return;
+        }
+
+        // Fila real del modelo (por si la tabla está ordenada)
+        fila = tblCitas.convertRowIndexToModel(fila);
+
+        modelo.setValueAt(txtPaciente.getText().trim(), fila, 1);
+        modelo.setValueAt(cbMedico.getSelectedItem(), fila, 2);
+        modelo.setValueAt(cbEspecialidad.getSelectedItem(), fila, 3);
+        modelo.setValueAt(txtFecha.getText().trim(), fila, 4);
+        modelo.setValueAt(txtHora.getText().trim(), fila, 5);
+        modelo.setValueAt(cbEstado.getSelectedItem(), fila, 6);
+
+        JOptionPane.showMessageDialog(this, "Cita modificada correctamente");
+        limpiar();
+
+    }//GEN-LAST:event_btnModificarActionPerformed
+
+    private void btnEliminarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarActionPerformed
+        int fila = tblCitas.getSelectedRow();
+        if (fila == -1) {
+            JOptionPane.showMessageDialog(this, "Selecciona una cita de la tabla");
+            return;
+        }
+
+        int respuesta = JOptionPane.showConfirmDialog(this,
+                "¿Seguro que deseas eliminar esta cita?",
+                "Confirmar eliminación",
+                JOptionPane.YES_NO_OPTION);
+
+        if (respuesta == JOptionPane.YES_OPTION) {
+            // Fila real del modelo (por si la tabla está ordenada)
+            fila = tblCitas.convertRowIndexToModel(fila);
+            modelo.removeRow(fila);
+            limpiar();
+        }
+    }//GEN-LAST:event_btnEliminarActionPerformed
 
     /**
      * @param args the command line arguments
