@@ -23,7 +23,10 @@ public class FrmCitas extends javax.swing.JFrame {
 
     public FrmCitas() {
         initComponents();
-        setLocationRelativeTo(null);
+        txtPaciente.putClientProperty("JTextField.placeholderText", "Nombre completo del paciente");
+
+        
+     setLocationRelativeTo(null);
                 cbMedico.setModel(new javax.swing.DefaultComboBoxModel<>(new String[]{
             "Dr. Ramírez", "Dra. Santos", "Dr. Fernández", "Dra. Morales",
             "Dr. Castillo", "Lic. Vargas", "Dra. Peña", "Dr. Herrera",
@@ -128,11 +131,11 @@ private void cargarEspecialidades() {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Registro de Citas Médicas");
-        setBackground(new java.awt.Color(245, 247, 250));
+        setBackground(new java.awt.Color(234, 242, 248));
         setFocusTraversalPolicyProvider(true);
 
         lblTitulo.setFont(new java.awt.Font("Segoe UI", 1, 22)); // NOI18N
-        lblTitulo.setForeground(new java.awt.Color(31, 58, 95));
+        lblTitulo.setForeground(new java.awt.Color(11, 60, 93));
         lblTitulo.setText("REGISTRO DE CITAS MÉDICAS");
 
         lblPaciente.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
@@ -181,15 +184,23 @@ private void cargarEspecialidades() {
         cbEstado.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         cbEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "PENDIENTE", "CONFIRMADA", "CANCELADA" }));
 
+        btnAgendar.setBackground(new java.awt.Color(37, 99, 235));
+        btnAgendar.setForeground(new java.awt.Color(255, 255, 255));
         btnAgendar.setText("Agendar");
         btnAgendar.addActionListener(this::btnAgendarActionPerformed);
 
+        btnModificar.setBackground(new java.awt.Color(2, 132, 199));
+        btnModificar.setForeground(new java.awt.Color(255, 255, 255));
         btnModificar.setText("Modificar");
         btnModificar.addActionListener(this::btnModificarActionPerformed);
 
+        btnEliminar.setBackground(new java.awt.Color(220, 38, 38));
+        btnEliminar.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminar.setText("Eliminar");
         btnEliminar.addActionListener(this::btnEliminarActionPerformed);
 
+        btnLimpiar.setBackground(new java.awt.Color(238, 241, 245));
+        btnLimpiar.setForeground(new java.awt.Color(51, 65, 85));
         btnLimpiar.setText("Limpiar");
         btnLimpiar.addActionListener(this::btnLimpiarActionPerformed);
 
@@ -433,25 +444,11 @@ limpiar();
      * @param args the command line arguments
      */
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
+       com.formdev.flatlaf.FlatLightLaf.setup();
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> new FrmCitas().setVisible(true));
+    
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
