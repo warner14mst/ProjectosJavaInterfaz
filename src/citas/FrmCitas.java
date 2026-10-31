@@ -99,7 +99,10 @@ private void cargarEspecialidades() {
         }
         return false;
     }
-    
+        private String escapar(Object valor) {
+        String s = (valor == null) ? "" : valor.toString();
+        return s.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -128,6 +131,7 @@ private void cargarEspecialidades() {
         btnLimpiar = new javax.swing.JButton();
         scrollCitas = new javax.swing.JScrollPane();
         tblCitas = new javax.swing.JTable();
+        btnGuardar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Registro de Citas Médicas");
@@ -205,6 +209,7 @@ private void cargarEspecialidades() {
         btnLimpiar.addActionListener(this::btnLimpiarActionPerformed);
 
         tblCitas.setAutoCreateRowSorter(true);
+        tblCitas.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         tblCitas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null, null, null},
@@ -224,6 +229,9 @@ private void cargarEspecialidades() {
                 return canEdit [columnIndex];
             }
         });
+        tblCitas.setGridColor(new java.awt.Color(221, 230, 238));
+        tblCitas.setRowHeight(28);
+        tblCitas.setShowHorizontalLines(true);
         tblCitas.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tblCitasMouseClicked(evt);
@@ -231,6 +239,11 @@ private void cargarEspecialidades() {
         });
         scrollCitas.setViewportView(tblCitas);
         tblCitas.getColumnModel().getSelectionModel().setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+
+        btnGuardar.setBackground(new java.awt.Color(46, 139, 87));
+        btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardar.setText("Guardar");
+        btnGuardar.addActionListener(this::btnGuardarActionPerformed);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -246,7 +259,9 @@ private void cargarEspecialidades() {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(btnEliminar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnLimpiar))
+                        .addComponent(btnLimpiar)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(btnGuardar, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lblPaciente)
@@ -313,10 +328,11 @@ private void cargarEspecialidades() {
                     .addComponent(btnAgendar)
                     .addComponent(btnModificar)
                     .addComponent(btnEliminar)
-                    .addComponent(btnLimpiar))
+                    .addComponent(btnLimpiar)
+                    .addComponent(btnGuardar))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(scrollCitas, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(39, Short.MAX_VALUE))
         );
 
         pack();
@@ -373,7 +389,7 @@ limpiar();
             return;
         }
 
-        // Convertimos la fila visible a la fila real del modelo (por si ordenaste la tabla)
+        
         fila = tblCitas.convertRowIndexToModel(fila);
 
         txtPaciente.setText(modelo.getValueAt(fila, 1).toString());
@@ -433,12 +449,57 @@ limpiar();
                 JOptionPane.YES_NO_OPTION);
 
         if (respuesta == JOptionPane.YES_OPTION) {
-            // Fila real del modelo (por si la tabla está ordenada)
+           
             fila = tblCitas.convertRowIndexToModel(fila);
             modelo.removeRow(fila);
             limpiar();
         }
     }//GEN-LAST:event_btnEliminarActionPerformed
+
+    private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
+       if (modelo.getRowCount() == 0) {
+            JOptionPane.showMessageDialog(this, "No hay citas para guardar");
+            return;
+        }
+
+        javax.swing.JFileChooser selector = new javax.swing.JFileChooser();
+        selector.setSelectedFile(new java.io.File("citas.json"));
+        if (selector.showSaveDialog(this) != javax.swing.JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        java.io.File archivo = selector.getSelectedFile();
+        if (!archivo.getName().toLowerCase().endsWith(".json")) {
+            archivo = new java.io.File(archivo.getParentFile(), archivo.getName() + ".json");
+        }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        for (int i = 0; i < modelo.getRowCount(); i++) {
+            sb.append("  {\n");
+            sb.append("    \"id\": ").append(modelo.getValueAt(i, 0)).append(",\n");
+            sb.append("    \"paciente\": \"").append(escapar(modelo.getValueAt(i, 1))).append("\",\n");
+            sb.append("    \"medico\": \"").append(escapar(modelo.getValueAt(i, 2))).append("\",\n");
+            sb.append("    \"especialidad\": \"").append(escapar(modelo.getValueAt(i, 3))).append("\",\n");
+            sb.append("    \"fecha\": \"").append(escapar(modelo.getValueAt(i, 4))).append("\",\n");
+            sb.append("    \"hora\": \"").append(escapar(modelo.getValueAt(i, 5))).append("\",\n");
+            sb.append("    \"estado\": \"").append(escapar(modelo.getValueAt(i, 6))).append("\"\n");
+            sb.append("  }");
+            if (i < modelo.getRowCount() - 1) {
+                sb.append(",");
+            }
+            sb.append("\n");
+        }
+        sb.append("]\n");
+
+        try {
+            java.nio.file.Files.write(archivo.toPath(),
+                    sb.toString().getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            JOptionPane.showMessageDialog(this, "Citas guardadas en:\n" + archivo.getAbsolutePath());
+        } catch (java.io.IOException e) {
+            JOptionPane.showMessageDialog(this, "No se pudo guardar el archivo: " + e.getMessage());
+        }
+    }//GEN-LAST:event_btnGuardarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -454,6 +515,7 @@ limpiar();
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAgendar;
     private javax.swing.JButton btnEliminar;
+    private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnModificar;
     private javax.swing.JComboBox<String> cbEspecialidad;
